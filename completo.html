@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mi Música · Biblioteca personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   VARIABLES Y RESET
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg:          #0a0a0f;
+    --surface:     #16161f;
+    --surface-2:   #1c1c28;
+    --border:      #26263a;
+    --border-soft: #1f1f2e;
+    --text:        #ececf1;
+    --text-soft:   #a1a1b5;
+    --text-muted:  #6c6c80;
+    --accent:      #7c5cff;
+    --accent-2:    #ff4d8d;
+    --danger:      #ef4444;
+    --success:     #22c55e;
+    --grad-main:   linear-gradient(135deg, #7c5cff 0%, #ff4d8d 100%);
+    --grad-soft:   linear-gradient(135deg, rgba(124,92,255,0.15), rgba(255,77,141,0.15));
+    --grad-card:   linear-gradient(145deg, #16161f 0%, #1c1c28 100%);
+    --shadow-sm:   0 2px 8px rgba(0,0,0,0.3);
+    --shadow-md:   0 8px 24px rgba(0,0,0,0.4);
+    --shadow-glow: 0 0 40px rgba(124,92,255,0.25);
+    --radius-sm:   8px;
+    --radius:      14px;
+    --radius-lg:   20px;
+}
+
+html, body { height: 100%; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+        radial-gradient(1200px 600px at 10% -10%, rgba(124,92,255,0.12), transparent 60%),
+        radial-gradient(1000px 500px at 90% 0%, rgba(255,77,141,0.08), transparent 55%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1rem 2.5rem;
+    background: rgba(18, 18, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-soft);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+}
+
+.navbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    background: var(--grad-main);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+}
+
+.navbar .logo::before {
+    content: '🎧';
+    -webkit-text-fill-color: initial;
+    font-size: 1.4rem;
+}
+
+.navbar ul {
+    display: flex;
+    gap: 0.3rem;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.navbar a {
+    color: var(--text-soft);
+    text-decoration: none;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.navbar a:hover {
+    background: var(--surface-2);
+    color: var(--text);
+    transform: translateY(-1px);
+}
+
+.navbar a.active {
+    background: var(--grad-main);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(124,92,255,0.4);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.subtitulo {
+    color: var(--text-soft);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+h2 {
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 2rem 0 1rem;
+    letter-spacing: -0.02em;
+}
+
+h3 {
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 1.5rem 0 0.8rem;
+}
+
+/* Vistas: solo la activa se muestra */
+.vista { display: none; }
+.vista.activa { display: block; animation: fadeIn 0.3s ease; }
+
+/* ============================================================
+   ACCESOS RÁPIDOS
+   ============================================================ */
+.accesos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.acceso-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.4rem 1.3rem;
+    background: var(--grad-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--text);
+    overflow: hidden;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+}
+
+.acceso-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--grad-soft);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.acceso-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124,92,255,0.5);
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.acceso-card:hover::before { opacity: 1; }
+
+.acceso-card .icono { font-size: 1.8rem; line-height: 1; margin-bottom: 0.3rem; }
+.acceso-card .titulo { font-weight: 700; font-size: 1rem; color: #fff; letter-spacing: -0.01em; }
+.acceso-card .descripcion { font-size: 0.83rem; color: var(--text-soft); line-height: 1.4; }
+
+.acceso-card .flecha {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    color: var(--accent);
+    font-size: 1.1rem;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.25s ease;
+}
+
+.acceso-card:hover .flecha { opacity: 1; transform: translateX(0); }
+
+/* ============================================================
+   FORMULARIOS
+   ============================================================ */
+input, select, textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.7rem 0.95rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    width: 100%;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+input:hover, select:hover, textarea:hover { border-color: #34344a; }
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,92,255,0.15);
+    background: var(--surface-2);
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    max-width: 540px;
+}
+
+button.primary {
+    background: var(--grad-main);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(124,92,255,0.35);
+    letter-spacing: 0.01em;
+}
+
+button.primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(124,92,255,0.5);
+}
+
+button.primary:disabled { opacity: 0.5; cursor: wait; }
+
+button.ghost {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+button.ghost:hover { background: var(--surface-2); border-color: var(--accent); }
+
+/* ============================================================
+   FILTROS
+   ============================================================ */
+.filtros {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filtros input { flex: 1; min-width: 220px; }
+
+.filtros .check {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-soft);
+    white-space: nowrap;
+    cursor: pointer;
+    padding: 0.55rem 0.9rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.filtros .check:hover { border-color: #34344a; }
+.filtros .check input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: pointer; }
+
+/* ============================================================
+   TARJETA DE CANCIÓN
+   ============================================================ */
+.cancion-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.3rem;
+    background: var(--grad-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.7rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.cancion-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--grad-main);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.cancion-card:hover {
+    border-color: rgba(124,92,255,0.4);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
+}
+
+.cancion-card:hover::before { opacity: 1; }
+
+.cancion-card .info { flex: 1; min-width: 0; }
+
+.cancion-card .titulo {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    display: block;
+    transition: color 0.15s;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+}
+
+.cancion-card .titulo:hover { color: var(--accent); }
+.cancion-card .artista { color: var(--text-soft); margin: 0.2rem 0 0; font-size: 0.9rem; }
+
+.cancion-card .meta {
+    color: var(--text-muted);
+    margin: 0.15rem 0 0;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cancion-card .acciones { display: flex; align-items: center; gap: 0.7rem; flex-shrink: 0; }
+
+.cancion-card .fav {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.cancion-card .fav:hover { transform: scale(1.15); }
+.cancion-card .contador { color: var(--text-soft); font-size: 0.88rem; min-width: 3rem; font-variant-numeric: tabular-nums; }
+.cancion-card .duracion { color: var(--text-muted); font-size: 0.85rem; min-width: 3rem; text-align: right; font-variant-numeric: tabular-nums; }
+
+.cancion-card button:not(.fav) {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.cancion-card button:not(.fav):hover:not(:disabled) {
+    background: var(--grad-main);
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124,92,255,0.35);
+}
+
+.cancion-card button:disabled { opacity: 0.5; cursor: wait; }
+
+/* ============================================================
+   ESTADOS
+   ============================================================ */
+.vacio {
+    color: var(--text-muted);
+    padding: 2rem;
+    text-align: center;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+}
+
+.vacio a { color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer; }
+.vacio a:hover { text-decoration: underline; }
+
+.error {
+    color: var(--danger);
+    padding: 0.9rem 1.1rem;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.cargando {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+/* ============================================================
+   WRAPPED / PODIO
+   ============================================================ */
+.wrapped-bloque {
+    background: var(--grad-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.6rem 1.8rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.wrapped-bloque::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--grad-main);
+}
+
+.wrapped-bloque h2 {
+    margin-top: 0;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.podio { list-style: none; padding: 0; margin: 0 0 0.5rem; }
+
+.podio li {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.7rem 0.4rem;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text);
+    transition: background 0.15s;
+    border-radius: 6px;
+}
+
+.podio li:hover { background: var(--surface-2); }
+.podio li:last-child { border-bottom: none; }
+.podio .medalla { font-size: 1.35rem; min-width: 1.8rem; text-align: center; }
+.podio .nombre { font-weight: 600; color: #fff; }
+.podio .sub { color: var(--text-soft); font-size: 0.9rem; }
+
+.podio button[data-eliminar] {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.15s;
+    font-size: 0.9rem;
+}
+
+.podio button[data-eliminar]:hover { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+/* ============================================================
+   DETALLE
+   ============================================================ */
+.detalles {
+    list-style: none;
+    padding: 1.4rem 1.6rem;
+    background: var(--grad-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 1.5rem 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.detalles li {
+    padding: 0.5rem 0;
+    color: var(--text);
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    gap: 0.6rem;
+}
+
+.detalles li:last-child { border-bottom: none; }
+
+.detalles strong {
+    color: var(--text-soft);
+    font-weight: 600;
+    min-width: 110px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 0.15rem;
+}
+
+.notas {
+    background: var(--surface);
+    padding: 1.1rem 1.3rem;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent);
+    color: var(--text-soft);
+    line-height: 1.6;
+}
+
+.links { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0; }
+
+.links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.links a:hover {
+    background: var(--surface-2);
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   ESTADÍSTICAS
+   ============================================================ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--grad-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.2rem;
+    text-align: center;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--grad-main);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124,92,255,0.4);
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.stat-card .numero {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: var(--grad-main);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.stat-card .label {
+    color: var(--text-soft);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.top-lista { list-style: none; padding: 0; counter-reset: ranking; }
+
+.top-lista li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+    transition: all 0.15s ease;
+    gap: 1rem;
+}
+
+.top-lista li:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+    transform: translateX(3px);
+}
+
+.top-lista li:not(.vacio)::before {
+    counter-increment: ranking;
+    content: counter(ranking);
+    color: var(--accent);
+    font-weight: 800;
+    margin-right: 1rem;
+    min-width: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.top-lista .valor { color: var(--text-soft); font-size: 0.9rem; }
+.top-lista .vacio { padding: 1rem; text-align: left; background: transparent; border: none; }
+.top-lista .vacio::before { content: none; }
+
+/* ============================================================
+   ACCIONES DE DATOS (footer)
+   ============================================================ */
+.datos-acciones {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-soft);
+    justify-content: center;
+}
+
+.datos-acciones button {
+    background: var(--surface);
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.datos-acciones button:hover {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--accent);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px) {
+    .navbar { padding: 0.9rem 1.2rem; }
+    .navbar ul { gap: 0.2rem; }
+    .navbar a { padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+    main { padding: 2rem 1rem; }
+    h1 { font-size: 1.6rem; }
+    .cancion-card { flex-direction: column; align-items: flex-start; }
+    .cancion-card .acciones { width: 100%; justify-content: flex-end; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar">
+    <span class="logo" onclick="irA('inicio')">Mi Música</span>
+    <ul>
+        <li><a data-vista="inicio"       onclick="irA('inicio')">🏠 Inicio</a></li>
+        <li><a data-vista="agregar"      onclick="irA('agregar')">➕ Agregar</a></li>
+        <li><a data-vista="favoritas"    onclick="irA('favoritas')">❤️ Favoritas</a></li>
+        <li><a data-vista="wrapped"      onclick="irA('wrapped')">🏆 Wrapped</a></li>
+        <li><a data-vista="estadisticas" onclick="irA('estadisticas')">📊 Estadísticas</a></li>
+    </ul>
+</nav>
+
+<main>
+
+<!-- ============================================================
+     VISTA: INICIO
+     ============================================================ -->
+<section id="vista-inicio" class="vista activa">
+    <h1>🎵 Mi Biblioteca</h1>
+    <p class="subtitulo">Tu colección personal de música, escuchas y Wrapped.</p>
+
+    <section class="accesos-grid" aria-label="Accesos rápidos">
+        <a class="acceso-card" onclick="irA('agregar')">
+            <span class="flecha">→</span>
+            <span class="icono">➕</span>
+            <span class="titulo">Agregar canción</span>
+            <span class="descripcion">Sumá un tema nuevo a tu biblioteca.</span>
+        </a>
+        <a class="acceso-card" onclick="irA('favoritas')">
+            <span class="flecha">→</span>
+            <span class="icono">❤️</span>
+            <span class="titulo">Favoritas</span>
+            <span class="descripcion">Tus canciones más queridas.</span>
+        </a>
+        <a class="acceso-card" onclick="irA('wrapped')">
+            <span class="flecha">→</span>
+            <span class="icono">🏆</span>
+            <span class="titulo">Wrapped</span>
+            <span class="descripcion">Podios de Spotify y YouTube desde 2023.</span>
+        </a>
+        <a class="acceso-card" onclick="irA('estadisticas')">
+            <span class="flecha">→</span>
+            <span class="icono">📊</span>
+            <span class="titulo">Estadísticas</span>
+            <span class="descripcion">Top canciones, artistas y géneros.</span>
+        </a>
+    </section>
+
+    <h2>Todas las canciones</h2>
+
+    <div class="filtros">
+        <input id="busqueda" placeholder="Buscar por título, artista o álbum..." oninput="onBuscar()" />
+        <label class="check">
+            <input type="checkbox" id="soloFavoritas" onchange="cargarLista()" />
+            Solo favoritas
+        </label>
+    </div>
+
+    <div id="lista-inicio"></div>
+</section>
+
+<!-- ============================================================
+     VISTA: FAVORITAS
+     ============================================================ -->
+<section id="vista-favoritas" class="vista">
+    <h1>❤️ Favoritas</h1>
+    <p class="subtitulo">Tus canciones más queridas.</p>
+    <div id="lista-favoritas"></div>
+</section>
+
+<!-- ============================================================
+     VISTA: AGREGAR
+     ============================================================ -->
+<section id="vista-agregar" class="vista">
+    <h1>➕ Agregar canción</h1>
+    <p class="subtitulo">Completá los datos del tema. Se guarda en tu navegador.</p>
+    <p id="error-agregar" class="error" hidden></p>
+
+    <form id="form-cancion" onsubmit="guardarCancion(event)">
+        <label>Título *
+            <input name="titulo" required placeholder="Ej: Bohemian Rhapsody" />
+        </label>
+        <label>Artista *
+            <input name="artista" required placeholder="Ej: Queen" />
+        </label>
+        
+        <label>Género
+            <input name="genero" placeholder="Ej: Rock" />
+        </label>
+        
+        
+        <label>Notas
+            <textarea name="notas" rows="3" placeholder="Por qué te gusta, recuerdos..."></textarea>
+        </label>
+        <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
+            <button class="primary" type="submit" id="btn-guardar">💾 Guardar</button>
+            <button class="ghost" type="button" onclick="irA('inicio')">Cancelar</button>
+        </div>
+    </form>
+</section>
+
+<!-- ============================================================
+     VISTA: WRAPPED
+     ============================================================ -->
+<section id="vista-wrapped" class="vista">
+    <h1>🏆 Wrapped</h1>
+    <p class="subtitulo">Tus podios anuales de Spotify y YouTube desde 2023.</p>
+
+    <h2>Agregar entrada al podio</h2>
+    <form id="form-wrapped" onsubmit="guardarWrapped(event)">
+        <label>Año
+            <input type="number" name="anio" required placeholder="2024" min="2023" max="2100" />
+        </label>
+        <label>Plataforma
+            <select name="plataforma" required>
+                <option value="spotify">🟢 Spotify</option>
+                <option value="youtube">🔴 YouTube</option>
+            </select>
+        </label>
+        <label>Categoría
+            <select name="categoria" required>
+                <option value="cancion">Canción</option>
+                <option value="artista">Artista</option>
+                <option value="album">Álbum</option>
+                <option value="genero">Género</option>
+            </select>
+        </label>
+        <label>Posición
+            <select name="posicion" required>
+                <option value="1">🥇 1º</option>
+                <option value="2">🥈 2º</option>
+                <option value="3">🥉 3º</option>
+                <option value="4">4º</option>
+                <option value="5">5º</option>
+            </select>
+        </label>
+        <label>Nombre *
+            <input name="nombre" required placeholder="Ej: Canción o artista" />
+        </label>
+        <label>Artista (opcional)
+            <input name="artista" placeholder="Ej: Queen" />
+        </label>
+        <button class="primary" type="submit">➕ Agregar al podio</button>
+    </form>
+
+    <h2>Podios cargados</h2>
+    <div id="wrapped-lista"></div>
+</section>
+
+<!-- ============================================================
+     VISTA: ESTADÍSTICAS
+     ============================================================ -->
+<section id="vista-estadisticas" class="vista">
+    <h1>📊 Estadísticas</h1>
+    <p class="subtitulo">Un resumen de tu actividad musical.</p>
+
+    <div id="resumen" class="stats-grid"></div>
+
+    <h2>🎵 Top canciones</h2>
+    <ul id="top-canciones" class="top-lista"></ul>
+
+    <h2>🎤 Top artistas</h2>
+    <ul id="top-artistas" class="top-lista"></ul>
+
+    <h2>🎼 Géneros</h2>
+    <ul id="top-generos" class="top-lista"></ul>
+</section>
+
+<!-- ============================================================
+     VISTA: DETALLE
+     ============================================================ -->
+<section id="vista-detalle" class="vista">
+    <div id="detalle-contenido"></div>
+</section>
+
+<!-- ============================================================
+     FOOTER · Acciones de datos
+     ============================================================ -->
+<div class="datos-acciones">
+    <button onclick="exportarDatos()">📤 Exportar JSON</button>
+    <button onclick="document.getElementById('input-importar').click()">📥 Importar JSON</button>
+    <button onclick="borrarTodo()">🗑️ Borrar todo</button>
+    <input type="file" id="input-importar" accept="application/json" hidden onchange="importarDatos(event)" />
+</div>
+
+</main>
+
+<script>
+/* ============================================================
+   ALMACÉN · localStorage
+   ============================================================ */
+const CLAVES = {
+    CANCIONES:   'mm_canciones',
+    WRAPPED:     'mm_wrapped',
+    CONTADOR_ID: 'mm_contador_id'
+};
+
+function leer(clave, fallback = []) {
+    try {
+        const raw = localStorage.getItem(clave);
+        return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+        console.error('Error leyendo', clave, e);
+        return fallback;
+    }
+}
+
+function escribir(clave, valor) {
+    try {
+        localStorage.setItem(clave, JSON.stringify(valor));
+    } catch (e) {
+        console.error('Error escribiendo', clave, e);
+        alert('No se pudo guardar: ¿almacenamiento lleno?');
+    }
+}
+
+function siguienteId() {
+    const actual = parseInt(localStorage.getItem(CLAVES.CONTADOR_ID) || '0', 10);
+    const nuevo = actual + 1;
+    localStorage.setItem(CLAVES.CONTADOR_ID, String(nuevo));
+    return nuevo;
+}
+
+/* ---------- Canciones ---------- */
+function listarCanciones(filtros = {}) {
+    let lista = leer(CLAVES.CANCIONES, []);
+    const { q, favoritas } = filtros;
+
+    if (q) {
+        const ql = q.toLowerCase();
+        lista = lista.filter(c =>
+            (c.titulo  || '').toLowerCase().includes(ql) ||
+            (c.artista || '').toLowerCase().includes(ql) ||
+            (c.album   || '').toLowerCase().includes(ql)
+        );
+    }
+    if (favoritas) lista = lista.filter(c => c.es_favorita);
+
+    return lista.sort((a, b) => new Date(b.fecha_agregada) - new Date(a.fecha_agregada));
+}
+
+function obtenerCancion(id) {
+    return leer(CLAVES.CANCIONES, []).find(c => String(c.id) === String(id));
+}
+
+function crearCancion(datos) {
+    if (!datos.titulo || !datos.artista) throw new Error('Título y artista son obligatorios');
+    const lista = leer(CLAVES.CANCIONES, []);
+    const nueva = {
+        id: siguienteId(),
+        titulo: datos.titulo.trim(),
+        artista: datos.artista.trim(),
+        album: datos.album?.trim() || null,
+        genero: datos.genero?.trim() || null,
+        anio: datos.anio ? parseInt(datos.anio) : null,
+        duracion_seg: datos.duracion_seg ? parseInt(datos.duracion_seg) : null,
+        url_spotify: datos.url_spotify?.trim() || null,
+        url_youtube: datos.url_youtube?.trim() || null,
+        notas: datos.notas?.trim() || null,
+        es_favorita: false,
+        veces_escuchada: 0,
+        fecha_agregada: new Date().toISOString(),
+        ultima_vez: null
+    };
+    lista.push(nueva);
+    escribir(CLAVES.CANCIONES, lista);
+    return nueva;
+}
+
+function actualizarCancion(id, cambios) {
+    const lista = leer(CLAVES.CANCIONES, []);
+    const idx = lista.findIndex(c => String(c.id) === String(id));
+    if (idx === -1) throw new Error('No encontrada');
+    lista[idx] = { ...lista[idx], ...cambios, id: lista[idx].id };
+    escribir(CLAVES.CANCIONES, lista);
+    return lista[idx];
+}
+
+function eliminarCancion(id) {
+    escribir(CLAVES.CANCIONES, leer(CLAVES.CANCIONES, []).filter(c => String(c.id) !== String(id)));
+}
+
+function sumarEscucha(id) {
+    const lista = leer(CLAVES.CANCIONES, []);
+    const idx = lista.findIndex(c => String(c.id) === String(id));
+    if (idx === -1) throw new Error('No encontrada');
+    lista[idx].veces_escuchada = (lista[idx].veces_escuchada || 0) + 1;
+    lista[idx].ultima_vez = new Date().toISOString();
+    escribir(CLAVES.CANCIONES, lista);
+    return lista[idx];
+}
+
+/* ---------- Wrapped ---------- */
+function listarAnios() {
+    const items = leer(CLAVES.WRAPPED, []);
+    const set = new Map();
+    for (const w of items) {
+        const k = `${w.anio}-${w.plataforma}`;
+        if (!set.has(k)) set.set(k, { anio: w.anio, plataforma: w.plataforma });
+    }
+    return Array.from(set.values()).sort((a, b) => b.anio - a.anio || a.plataforma.localeCompare(b.plataforma));
+}
+
+function obtenerWrapped(anio, plataforma) {
+    return leer(CLAVES.WRAPPED, [])
+        .filter(w => String(w.anio) === String(anio) && w.plataforma === plataforma)
+        .sort((a, b) => a.categoria.localeCompare(b.categoria) || a.posicion - b.posicion);
+}
+
+function crearWrapped(datos) {
+    const items = leer(CLAVES.WRAPPED, []);
+    const anio = parseInt(datos.anio);
+    const posicion = parseInt(datos.posicion);
+
+    const duplicado = items.some(w =>
+        w.anio === anio && w.plataforma === datos.plataforma &&
+        w.categoria === datos.categoria && w.posicion === posicion
+    );
+    if (duplicado) throw new Error('Esa posición ya está ocupada en ese podio');
+
+    const nuevo = {
+        id: siguienteId(),
+        anio, posicion,
+        plataforma: datos.plataforma,
+        categoria: datos.categoria,
+        nombre: datos.nombre.trim(),
+        artista: datos.artista?.trim() || null
+    };
+    items.push(nuevo);
+    escribir(CLAVES.WRAPPED, items);
+    return nuevo;
+}
+
+function eliminarWrapped(id) {
+    escribir(CLAVES.WRAPPED, leer(CLAVES.WRAPPED, []).filter(w => String(w.id) !== String(id)));
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function formatoDuracion(seg) {
+    if (!seg) return '—';
+    const m = Math.floor(seg / 60);
+    const s = String(seg % 60).padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+function formatoFecha(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function esc(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+const MEDALLAS = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+/* ============================================================
+   NAVEGACIÓN ENTRE VISTAS
+   ============================================================ */
+function irA(vista, param) {
+    document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+    const el = document.getElementById(`vista-${vista}`);
+    if (el) el.classList.add('activa');
+
+    document.querySelectorAll('.navbar a').forEach(a => {
+        a.classList.toggle('active', a.dataset.vista === vista);
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Recargar la vista según corresponda
+    if (vista === 'inicio') cargarLista();
+    if (vista === 'favoritas') cargarFavoritas();
+    if (vista === 'wrapped') cargarWrapped();
+    if (vista === 'estadisticas') cargarEstadisticas();
+    if (vista === 'detalle' && param) cargarDetalle(param);
+
+    history.replaceState(null, '', `#${vista}${param ? '/' + param : ''}`);
+}
+
+/* ============================================================
+   VISTA INICIO
+   ============================================================ */
+let debounceBusqueda;
+
+function onBuscar() {
+    clearTimeout(debounceBusqueda);
+    debounceBusqueda = setTimeout(cargarLista, 200);
+}
+
+function cargarLista() {
+    const contenedor = document.getElementById('lista-inicio');
+    const q = document.getElementById('busqueda').value;
+    const soloFav = document.getElementById('soloFavoritas').checked;
+
+    const canciones = listarCanciones({ q, favoritas: soloFav });
+
+    if (canciones.length === 0) {
+        contenedor.innerHTML = soloFav
+            ? '<p class="vacio">Todavía no marcaste favoritas. ❤️</p>'
+            : '<p class="vacio">No hay canciones. <a onclick="irA(\'agregar\')">Agregá la primera</a> 🎶</p>';
+        return;
+    }
+    contenedor.innerHTML = canciones.map(cancionHTML).join('');
+}
+
+function cancionHTML(c) {
+    const meta = [c.genero, c.anio].filter(Boolean).join(' · ');
+    return `
+        <article class="cancion-card" data-id="${c.id}">
+            <div class="info">
+                <span class="titulo" onclick="irA('detalle', ${c.id})">${esc(c.titulo)}</span>
+                <p class="artista">${esc(c.artista)}${c.album ? ` · ${esc(c.album)}` : ''}</p>
+                ${meta ? `<p class="meta">${esc(meta)}</p>` : ''}
+            </div>
+            <div class="acciones">
+                <button class="fav" onclick="toggleFav(${c.id}, this)" title="Favorita">
+                    ${c.es_favorita ? '❤️' : '🤍'}
+                </button>
+                <span class="contador" title="Veces escuchada">🔊 ${c.veces_escuchada || 0}</span>
+                <button onclick="sumarUno(${c.id}, this)">+1</button>
+                ${c.duracion_seg ? `<span class="duracion">${formatoDuracion(c.duracion_seg)}</span>` : ''}
+            </div>
+        </article>
+    `;
+}
+
+function toggleFav(id, btn) {
+    const c = obtenerCancion(id);
+    if (!c) return;
+    actualizarCancion(id, { es_favorita: !c.es_favorita });
+    btn.textContent = c.es_favorita ? '🤍' : '❤️';
+
+    // Si estamos en favoritas y se desmarcó, recargar
+    if (document.getElementById('vista-favoritas').classList.contains('activa')) {
+        cargarFavoritas();
+    }
+}
+
+function sumarUno(id, btn) {
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = '...';
+    try {
+        const c = sumarEscucha(id);
+        const contador = btn.parentElement.querySelector('.contador');
+        if (contador) contador.textContent = `🔊 ${c.veces_escuchada}`;
+    } catch (e) {
+        alert('Error: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+/* ============================================================
+   VISTA FAVORITAS
+   ============================================================ */
+function cargarFavoritas() {
+    const contenedor = document.getElementById('lista-favoritas');
+    const canciones = listarCanciones({ favoritas: true });
+
+    if (canciones.length === 0) {
+        contenedor.innerHTML = '<p class="vacio">Todavía no marcaste favoritas. ❤️</p>';
+        return;
+    }
+    contenedor.innerHTML = canciones.map(cancionHTML).join('');
+}
+
+/* ============================================================
+   VISTA AGREGAR
+   ============================================================ */
+function guardarCancion(e) {
+    e.preventDefault();
+    const form = e.target;
+    const errorP = document.getElementById('error-agregar');
+    const btn = document.getElementById('btn-guardar');
+
+    errorP.hidden = true;
+
+    const fd = new FormData(form);
+    const datos = {};
+    for (const [k, v] of fd.entries()) {
+        const val = v.trim();
+        datos[k] = val === '' ? null : val;
+    }
+
+    if (!datos.titulo || !datos.artista) {
+        errorP.textContent = 'Título y artista son obligatorios';
+        errorP.hidden = false;
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
+    try {
+        crearCancion(datos);
+        form.reset();
+        irA('inicio');
+    } catch (err) {
+        errorP.textContent = err.message;
+        errorP.hidden = false;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Guardar';
+    }
+}
+
+/* ============================================================
+   VISTA WRAPPED
+   ============================================================ */
+function cargarWrapped() {
+    const contenedor = document.getElementById('wrapped-lista');
+    const anios = listarAnios();
+
+    if (anios.length === 0) {
+        contenedor.innerHTML = '<p class="vacio">Todavía no cargaste ningún Wrapped. 🏆</p>';
+        return;
+    }
+
+    const bloques = anios.map(({ anio, plataforma }) => {
+        const entradas = obtenerWrapped(anio, plataforma);
+        const categorias = {};
+        for (const e of entradas) {
+            if (!categorias[e.categoria]) categorias[e.categoria] = [];
+            categorias[e.categoria].push(e);
+        }
+
+        const catHTML = Object.entries(categorias).map(([cat, items]) => `
+            <h3>${esc(cat)}</h3>
+            <ul class="podio">
+                ${items.map(i => `
+                    <li>
+                        <span class="medalla">${MEDALLAS[i.posicion] || i.posicion + 'º'}</span>
+                        <span class="nombre">${esc(i.nombre)}</span>
+                        ${i.artista ? `<span class="sub">— ${esc(i.artista)}</span>` : ''}
+                        <button data-eliminar="${i.id}" onclick="borrarWrapped(${i.id})" style="margin-left:auto;">✕</button>
+                    </li>
+                `).join('')}
+            </ul>
+        `).join('');
+
+        return `
+            <div class="wrapped-bloque">
+                <h2>${plataforma === 'spotify' ? '🟢' : '🔴'} ${anio} · ${plataforma === 'spotify' ? 'Spotify' : 'YouTube'}</h2>
+                ${catHTML}
+            </div>
+        `;
+    });
+
+    contenedor.innerHTML = bloques.join('');
+}
+
+function guardarWrapped(e) {
+    e.preventDefault();
+    const form = e.target;
+    const datos = Object.fromEntries(new FormData(form));
+    try {
+        crearWrapped(datos);
+        form.reset();
+        cargarWrapped();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+function borrarWrapped(id) {
+    if (!confirm('¿Eliminar esta entrada?')) return;
+    eliminarWrapped(id);
+    cargarWrapped();
+}
+
+/* ============================================================
+   VISTA DETALLE
+   ============================================================ */
+function cargarDetalle(id) {
+    const contenedor = document.getElementById('detalle-contenido');
+    const c = obtenerCancion(id);
+
+    if (!c) {
+        contenedor.innerHTML = `
+            <p class="error">Canción no encontrada.</p>
+            <p style="margin-top:1rem;"><a onclick="irA('inicio')" style="color:var(--accent); cursor:pointer;">← Volver al inicio</a></p>
+        `;
+        return;
+    }
+
+    const items = [];
+    if (c.album) items.push(`<li><strong>Álbum</strong> ${esc(c.album)}</li>`);
+    if (c.genero) items.push(`<li><strong>Género</strong> ${esc(c.genero)}</li>`);
+    if (c.anio) items.push(`<li><strong>Año</strong> ${c.anio}</li>`);
+    if (c.duracion_seg) items.push(`<li><strong>Duración</strong> ${formatoDuracion(c.duracion_seg)}</li>`);
+    items.push(`<li><strong>Escuchas</strong> ${c.veces_escuchada || 0}</li>`);
+    items.push(`<li><strong>Agregada</strong> ${formatoFecha(c.fecha_agregada)}</li>`);
+    if (c.ultima_vez) items.push(`<li><strong>Última vez</strong> ${formatoFecha(c.ultima_vez)}</li>`);
+    if (c.es_favorita) items.push('<li><strong>Estado</strong> ❤️ Favorita</li>');
+
+    const links = [];
+    if (c.url_spotify) links.push(`<a href="${esc(c.url_spotify)}" target="_blank" rel="noreferrer">🎧 Spotify</a>`);
+    if (c.url_youtube) links.push(`<a href="${esc(c.url_youtube)}" target="_blank" rel="noreferrer">▶️ YouTube</a>`);
+
+    contenedor.innerHTML = `
+        <h1>${esc(c.titulo)}</h1>
+        <p class="subtitulo">${esc(c.artista)}</p>
+        <ul class="detalles">${items.join('')}</ul>
+        ${c.notas ? `<h3>Notas</h3><p class="notas">${esc(c.notas)}</p>` : ''}
+        ${links.length ? `<div class="links">${links.join('')}</div>` : ''}
+        <div style="display:flex; gap:0.6rem; margin-top:2rem; flex-wrap:wrap;">
+            <button class="ghost" onclick="irA('inicio')">← Volver</button>
+            <button class="primary" style="background:linear-gradient(135deg,#ef4444,#b91c1c); box-shadow:0 4px 14px rgba(239,68,68,0.35);"
+                    onclick="borrarCancion(${c.id})">🗑️ Eliminar</button>
+        </div>
+    `;
+}
+
+function borrarCancion(id) {
+    if (!confirm('¿Eliminar esta canción?')) return;
+    eliminarCancion(id);
+    irA('inicio');
+}
+
+/* ============================================================
+   VISTA ESTADÍSTICAS
+   ============================================================ */
+function cargarEstadisticas() {
+    const canciones = leer(CLAVES.CANCIONES, []);
+
+    // Resumen
+    const totalCanciones = canciones.length;
+    const totalEscuchas = canciones.reduce((s, c) => s + (c.veces_escuchada || 0), 0);
+    const totalFavoritas = canciones.filter(c => c.es_favorita).length;
+    const totalArtistas = new Set(canciones.map(c => c.artista)).size;
+
+    document.getElementById('resumen').innerHTML = `
+        <div class="stat-card"><div class="numero">${totalCanciones}</div><div class="label">Canciones</div></div>
+        <div class="stat-card"><div class="numero">${totalEscuchas}</div><div class="label">Escuchas totales</div></div>
+        <div class="stat-card"><div class="numero">${totalFavoritas}</div><div class="label">Favoritas</div></div>
+        <div class="stat-card"><div class="numero">${totalArtistas}</div><div class="label">Artistas</div></div>
+    `;
+
+    // Top canciones
+    const topCanciones = [...canciones]
+        .sort((a, b) => (b.veces_escuchada || 0) - (a.veces_escuchada || 0))
+        .slice(0, 10);
+
+    document.getElementById('top-canciones').innerHTML = topCanciones.length
+        ? topCanciones.map(c => `
+            <li>
+                <span>${esc(c.titulo)} <span class="valor">— ${esc(c.artista)}</span></span>
+                <span class="valor">🔊 ${c.veces_escuchada || 0}</span>
+            </li>
+        `).join('')
+        : '<li class="vacio">Sin datos todavía</li>';
+
+    // Top artistas
+    const mapaArtistas = new Map();
+    for (const c of canciones) {
+        const a = mapaArtistas.get(c.artista) || { artista: c.artista, total: 0, canciones: 0 };
+        a.total += c.veces_escuchada || 0;
+        a.canciones += 1;
+        mapaArtistas.set(c.artista, a);
+    }
+    const topArtistas = Array.from(mapaArtistas.values()).sort((a, b) => b.total - a.total).slice(0, 10);
+
+    document.getElementById('top-artistas').innerHTML = topArtistas.length
+        ? topArtistas.map(a => `
+            <li>
+                <span>${esc(a.artista)} <span class="valor">(${a.canciones} canciones)</span></span>
+                <span class="valor">🔊 ${a.total}</span>
+            </li>
+        `).join('')
+        : '<li class="vacio">Sin datos todavía</li>';
+
+    // Géneros
+    const mapaGeneros = new Map();
+    for (const c of canciones) {
+        const g = c.genero || 'Sin género';
+        mapaGeneros.set(g, (mapaGeneros.get(g) || 0) + (c.veces_escuchada || 0));
+    }
+    const topGeneros = Array.from(mapaGeneros.entries())
+        .map(([genero, total]) => ({ genero, total }))
+        .sort((a, b) => b.total - a.total);
+
+    document.getElementById('top-generos').innerHTML = topGeneros.length
+        ? topGeneros.map(g => `
+            <li><span>${esc(g.genero)}</span><span class="valor">🔊 ${g.total}</span></li>
+        `).join('')
+        : '<li class="vacio">Sin datos todavía</li>';
+}
+
+/* ============================================================
+   EXPORTAR / IMPORTAR / BORRAR
+   ============================================================ */
+function exportarDatos() {
+    const datos = {
+        version: 1,
+        exportado: new Date().toISOString(),
+        canciones: leer(CLAVES.CANCIONES, []),
+        wrapped: leer(CLAVES.WRAPPED, []),
+        contadorId: parseInt(localStorage.getItem(CLAVES.CONTADOR_ID) || '0', 10)
+    };
+    const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mi-musica-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function importarDatos(e) {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    try {
+        const texto = await archivo.text();
+        const datos = JSON.parse(texto);
+        if (!datos.canciones) throw new Error('Archivo inválido');
+        if (!confirm(`Esto reemplaza TODOS tus datos actuales con ${datos.canciones.length} canciones. ¿Continuar?`)) return;
+        escribir(CLAVES.CANCIONES, datos.canciones);
+        escribir(CLAVES.WRAPPED, datos.wrapped || []);
+        localStorage.setItem(CLAVES.CONTADOR_ID, String(datos.contadorId || datos.canciones.length));
+        alert('✅ Datos importados correctamente');
+        irA('inicio');
+    } catch (err) {
+        alert('❌ Error al importar: ' + err.message);
+    } finally {
+        e.target.value = '';
+    }
+}
+
+function borrarTodo() {
+    if (!confirm('⚠️ Esto borra TODAS las canciones y Wrapped. ¿Estás seguro?')) return;
+    if (!confirm('⚠️⚠️ Última confirmación: no se puede deshacer.')) return;
+    Object.values(CLAVES).forEach(k => localStorage.removeItem(k));
+    alert('Datos borrados');
+    irA('inicio');
+}
+
+/* ============================================================
+   INICIALIZACIÓN
+   ============================================================ */
+(function init() {
+    const hash = window.location.hash.slice(1);
+    const [vista, param] = hash.split('/');
+    const vistaInicial = vista || 'inicio';
+    irA(vistaInicial, param ? parseInt(param) : undefined);
+})();
+</script>
+
+</body>
+</html>
